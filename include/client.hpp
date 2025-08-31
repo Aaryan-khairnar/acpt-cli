@@ -110,14 +110,6 @@ public:
         std::cout << "Connection closed.\n";
     }
 
-    void shutdown() {
-    if (connection_port != -1) {
-            close(connection_port);
-        }
-    if (res) {
-        freeaddrinfo(res);
-        res = nullptr;
-    }
 };
 
 #endif 

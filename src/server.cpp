@@ -2,35 +2,24 @@
 #include <iostream>
 #include <csignal>
 #include <unistd.h>
+#include <atomic>
 
-// TcpServer* serverPtr = nullptr; // global pointer to access the server in the signal handler
+std::atomic<bool> exitFlag(false);
 
-// void handleSigint(int signum) {
-//     std::cout << "\nCaught Ctrl+C, shutting down server...\n";
-//     if(serverPtr) delete serverPtr; // destructor will close sockets
-//     exit(signum);
-// }
-
-TcpServer* serverPtr = nullptr;
-
-void handleSigint(int signum) {
-    std::cout << "\nCaught Ctrl+C, shutting down server...\n";
-    if(serverPtr) serverPtr->shutdown(); // custom function to close sockets
-    exit(signum);
+void handleSigint(int) {
+    exitFlag = true; // just signal the main loop
 }
-
 
 int main() {
     signal(SIGINT, handleSigint); // register Ctrl+C handler
 
     try {
         TcpServer server("53490");
-        serverPtr = &server;
 
         server.acceptClient();
         std::cout << "Client connected. Ready to chat!\n";
 
-        while (true) {
+        while (!exitFlag) {
             std::string msg = server.receiveData();
             if(msg.empty()) {
                 std::cout << "Client disconnected.\n";

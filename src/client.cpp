@@ -1,16 +1,14 @@
 #include "client.hpp"
 #include <iostream>
 #include <csignal>
-#include <unistd.h>
 #include <limits>
-#include <csignal>
+#include <string>
+#include <atomic>
 
-TcpClient* clientPtr = nullptr; // global pointer for signal handler
+std::atomic<bool> exitFlag(false);
 
-void handleSigint(int signum) {
-    std::cout << "\nCaught Ctrl+C, closing connection...\n";
-    if(clientPtr) clientPtr->shutdown(); // destructor will close socket
-    exit(signum);
+void handleSigint(int) {
+    exitFlag = true; // just signal the main loop
 }
 
 int main() {
@@ -23,11 +21,10 @@ int main() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         TcpClient client(serverIp, "53490");
-        clientPtr = &client;
 
         std::cout << "Connected to server. Start chatting!\n";
 
-        while (true) {
+        while (exitFlag) {
             std::string message;
             std::cout << "You: ";
             std::getline(std::cin, message);
