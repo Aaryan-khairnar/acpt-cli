@@ -113,7 +113,7 @@ public:
         send(client_port[0], buffer.data(), buffer.size(), 0);
     }
 
-    std::string receiveData(int client_port[0]) {
+    std::string receiveData() {
     char headerBuf[4];
     int received = 0;
     // First, receive exactly 4 bytes of header

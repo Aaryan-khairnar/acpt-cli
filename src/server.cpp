@@ -3,7 +3,7 @@
 
 int main() {
     try {
-        TcpServer server("3490");
+        TcpServer server("53490");
         server.acceptClient();
         server.receiveData();
         server.sendData("Hello from server!");

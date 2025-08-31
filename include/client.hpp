@@ -25,6 +25,7 @@ public:
         int address_info_status = getaddrinfo(host.c_str(), port.c_str(), &hints, &res);
         if (address_info_status != 0) {
             throw std::runtime_error("getaddrinfo failed");
+            return;
         }
 
         connection_port = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -32,12 +33,14 @@ public:
             freeaddrinfo(res); //we free res because it has failed
             res = nullptr;
             throw std::runtime_error("socket failed");
+            return;
         }
 
         int connection_status = connect(connection_port, res->ai_addr, res->ai_addrlen);
         if (connection_status == -1) {
             freeaddrinfo(res);
             close(connection_port);
+            connection_port = -1;
             throw std::runtime_error("connection failed");
         }
 
@@ -90,7 +93,9 @@ public:
      
     ~TcpClient() {
         freeaddrinfo(res);
-        close(connection_port);
+        if (connection_port != -1) {
+            close(connection_port);
+        }
         std::cout << "Connection closed.\n";
     }
 };
