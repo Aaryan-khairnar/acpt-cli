@@ -13,7 +13,7 @@
 
 class TcpServer{
     int listening_port = -1;
-    std::vector<int> client_port; //vector for multiple clients
+    int client_port = -1; //vector for multiple clients
     struct addrinfo hints{}; //using {} here makes all values of hints default = 0 
     struct addrinfo *res=nullptr;
 
@@ -96,8 +96,8 @@ public:
     void acceptClient() {
         struct sockaddr_storage client_addr;
         socklen_t addr_size = sizeof(client_addr);
-        client_port[0] = accept(listening_port, (struct sockaddr*)&client_addr, &addr_size);
-        if (client_port[0] == -1) {
+        client_port = accept(listening_port, (struct sockaddr*)&client_addr, &addr_size);
+        if (client_port == -1) {
             throw std::runtime_error("accept failed");
         }
         std::cout << "Client connected!\n";
@@ -110,7 +110,7 @@ public:
         Message msg;
         msg.encode(data);
         const auto& buffer = msg.getData();
-        send(client_port[0], buffer.data(), buffer.size(), 0);
+        send(client_port, buffer.data(), buffer.size(), 0);
     }
 
     std::string receiveData() {
@@ -118,7 +118,7 @@ public:
     int received = 0;
     // First, receive exactly 4 bytes of header
     while (received < 4) {
-        int n = recv(client_port[0], headerBuf + received, 4 - received, 0);
+        int n = recv(client_port, headerBuf + received, 4 - received, 0);
         if (n <= 0) return ""; // connection closed or error
         received += n;
     }
@@ -132,7 +132,7 @@ public:
     payload.resize(headerValue);
     received = 0;
     while (received < headerValue) {
-        int n = recv(client_port[0], &payload[received], headerValue - received, 0);
+        int n = recv(client_port, &payload[received], headerValue - received, 0);
         if (n <= 0) return ""; // connection closed or error
         received += n;
     }
@@ -142,10 +142,15 @@ public:
 
     
     ~TcpServer() {
-        for (int fd : client_port) {
-            if (fd != -1) close(fd);
+        // for (int fd : client_port) {
+        //     if (fd != -1) close(fd);
+        // }
+        // client_port.clear();
+
+        if (client_port != -1){
+            close(client_port);
+            client_port = -1;
         }
-        client_port.clear();
 
         if (listening_port != -1) {
             close(listening_port);
