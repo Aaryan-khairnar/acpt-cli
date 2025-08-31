@@ -106,12 +106,24 @@ public:
     // Diffie hellman key exchange
     // exchange_key(){}
     
-    void sendData(std::string data){
-        Message msg;
-        msg.encode(data);
-        const auto& buffer = msg.getData();
-        send(client_port, buffer.data(), buffer.size(), 0);
+    void sendData(const std::string& text) {
+    Message msg;
+    msg.encode(text);
+    const auto& buffer = msg.getData();
+    size_t totalSent = 0;
+    size_t toSend = buffer.size();
+
+    while (totalSent < toSend) {
+        ssize_t sent = send(client_port, buffer.data() + totalSent, toSend - totalSent, 0);
+        if (sent <= 0) {
+            // error or connection closed
+            std::cerr << "Send failed!\n";
+            return;
+        }
+        totalSent += sent;
     }
+}
+
 
     std::string receiveData() {
     char headerBuf[4];
