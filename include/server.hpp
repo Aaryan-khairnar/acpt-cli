@@ -1,4 +1,3 @@
-
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -8,7 +7,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
-#include <cstring>
+#include <string>
+#include <stdexcept>
 #include "message.hpp"
 
 class TcpServer{

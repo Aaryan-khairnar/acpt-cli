@@ -6,7 +6,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <cstring>
+#include <string>
+#include <stdexcept>
 #include "message.hpp"
 
 class TcpClient{
@@ -21,7 +22,7 @@ public:
         hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
         hints.ai_socktype = SOCK_STREAM; // TCP
 
-        int address_info_status = getaddrinfo(nullptr, port.c_str(), &hints, &res);
+        int address_info_status = getaddrinfo(host.c_str(), port.c_str(), &hints, &res);
         if (address_info_status != 0) {
             throw std::runtime_error("getaddrinfo failed");
         }
@@ -55,7 +56,7 @@ public:
         send(connection_port, buffer.data(), buffer.size(), 0);
         }
 
-        std::string receiveData(int connection_port){
+        std::string receiveData(){
         char headerBuf[4];
         int received = 0;
         // First, receive exactly 4 bytes of header
@@ -95,4 +96,4 @@ public:
 };
 
 
-#endif CLIENT_HPP
+#endif

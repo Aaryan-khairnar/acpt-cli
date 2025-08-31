@@ -2,11 +2,12 @@
 #define MESSAGE_HPP
 
 #include <cstdlib>
-#include <cstring>
 #include <cstdio>
 #include <string>
 #include <iostream>
 #include <vector>
+#include <string>
+#include <stdexcept>
 
 /* 
 header is of 4 bytes and maxBytes can be stored as 512 bytes
@@ -57,4 +58,4 @@ public:
 
 };
 
-#endif MESSAGE_HPP
+#endif
