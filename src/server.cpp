@@ -19,6 +19,21 @@ int main() {
         server.acceptClient();
         std::cout << "Client connected. Ready to chat!\n";
 
+        // while (!exitFlag) {
+        //     std::string msg = server.receiveData();
+        //     if(msg.empty()) {
+        //         std::cout << "Client disconnected.\n";
+        //         break;
+        //     }
+        //     std::cout << "Client: " << msg << "\n";
+
+        //     std::string reply;
+        //     std::cout << "Enter reply: ";
+        //     std::getline(std::cin, reply);
+
+        //     server.sendData(reply);
+        // }
+
         while (!exitFlag) {
             std::string msg = server.receiveData();
             if(msg.empty()) {
@@ -27,12 +42,10 @@ int main() {
             }
             std::cout << "Client: " << msg << "\n";
 
-            std::string reply;
-            std::cout << "Enter reply: ";
-            std::getline(std::cin, reply);
-
-            server.sendData(reply);
+        // automatically reply
+            server.sendData("Message received!");
         }
+
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";

@@ -24,11 +24,24 @@ int main() {
 
         std::cout << "Connected to server. Start chatting!\n";
 
-        while (exitFlag) {
-            std::string message;
-            std::cout << "You: ";
-            std::getline(std::cin, message);
+        // while (exitFlag) {
+        //     std::string message;
+        //     std::cout << "You: ";
+        //     std::getline(std::cin, message);
 
+        //     client.sendData(message);
+
+        //     std::string reply = client.receiveData();
+        //     if(reply.empty()) {
+        //         std::cout << "Server disconnected.\n";
+        //         break;
+        //     }
+        //     std::cout << "Server: " << reply << "\n";
+        // }
+
+        while (!exitFlag) {
+            std::string message;
+            std::getline(std::cin, message);
             client.sendData(message);
 
             std::string reply = client.receiveData();
@@ -38,6 +51,7 @@ int main() {
             }
             std::cout << "Server: " << reply << "\n";
         }
+
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
