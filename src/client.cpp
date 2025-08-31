@@ -7,8 +7,8 @@ int main() {
         std::string ipa;
         std::cin >> ipa;
         TcpClient client(ipa, "53490");
+        client.receiveData();   // wait first
         client.sendData("helloworld");
-        client.receiveData();
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
     }
