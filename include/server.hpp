@@ -176,6 +176,22 @@ public:
         std::cout << "Server shutdown.\n";
     }
 
+    void shutdown() {
+    if (client_port != -1) {
+        close(client_port);
+        client_port = -1;
+    }
+    if (listening_port != -1) {
+        close(listening_port);
+        listening_port = -1;
+    }
+    if (res) {
+        freeaddrinfo(res);
+        res = nullptr;
+    }
+}
+
+
 };
 
 #endif

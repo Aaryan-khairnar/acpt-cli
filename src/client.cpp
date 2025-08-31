@@ -3,12 +3,13 @@
 #include <csignal>
 #include <unistd.h>
 #include <limits>
+#include <csignal>
 
 TcpClient* clientPtr = nullptr; // global pointer for signal handler
 
 void handleSigint(int signum) {
     std::cout << "\nCaught Ctrl+C, closing connection...\n";
-    if(clientPtr) delete clientPtr; // destructor will close socket
+    if(clientPtr) clientPtr->shutdown(); // destructor will close socket
     exit(signum);
 }
 

@@ -3,13 +3,22 @@
 #include <csignal>
 #include <unistd.h>
 
-TcpServer* serverPtr = nullptr; // global pointer to access the server in the signal handler
+// TcpServer* serverPtr = nullptr; // global pointer to access the server in the signal handler
+
+// void handleSigint(int signum) {
+//     std::cout << "\nCaught Ctrl+C, shutting down server...\n";
+//     if(serverPtr) delete serverPtr; // destructor will close sockets
+//     exit(signum);
+// }
+
+TcpServer* serverPtr = nullptr;
 
 void handleSigint(int signum) {
     std::cout << "\nCaught Ctrl+C, shutting down server...\n";
-    if(serverPtr) delete serverPtr; // destructor will close sockets
+    if(serverPtr) serverPtr->shutdown(); // custom function to close sockets
     exit(signum);
 }
+
 
 int main() {
     signal(SIGINT, handleSigint); // register Ctrl+C handler
