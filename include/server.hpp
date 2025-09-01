@@ -105,53 +105,16 @@ public:
 
     // Diffie hellman key exchange
     // exchange_key(){}
-    
-    void sendData(const std::string& text) {
-    Message msg;
-    msg.encode(text);
-    const auto& buffer = msg.getData();
-    size_t totalSent = 0;
-    size_t toSend = buffer.size();
 
-    while (totalSent < toSend) {
-        ssize_t sent = send(client_port, buffer.data() + totalSent, toSend - totalSent, 0);
-        if (sent <= 0) {
-            // error or connection closed
-            std::cerr << "Send failed!\n";
-            return;
-        }
-        totalSent += sent;
-    }
-}
-
-
-    std::string receiveData() {
-    char headerBuf[4];
-    int received = 0;
-    // First, receive exactly 4 bytes of header
-    while (received < 4) {
-        int n = recv(client_port, headerBuf + received, 4 - received, 0);
-        if (n <= 0) return ""; // connection closed or error
-        received += n;
-    }
-    // Convert header to integer
-    int headerValue = (headerBuf[0] - '0') * 1000 +
-                      (headerBuf[1] - '0') * 100  +
-                      (headerBuf[2] - '0') * 10   +
-                      (headerBuf[3] - '0');
-    // Now receive exactly 'headerValue' bytes of payload
-    std::string payload;
-    payload.resize(headerValue);
-    received = 0;
-    while (received < headerValue) {
-        int n = recv(client_port, &payload[received], headerValue - received, 0);
-        if (n <= 0) return ""; // connection closed or error
-        received += n;
+    void sendData(const std::string& text){
+        Message m;
+        m.sendData(text, client_port);
     }
 
-    return payload;
+    std::string receiveData(){
+        Message m;
+        return m.receiveData(client_port);
     }
-
     
     ~TcpServer() {
         // for (int fd : client_port) {

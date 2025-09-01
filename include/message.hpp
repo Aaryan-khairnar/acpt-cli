@@ -53,6 +53,57 @@ public:
     return data;
     }
 
+
+    void sendData(const std::string& text, int& port) {
+        encode(text);
+        const auto& buffer = getData();
+
+        size_t totalSent = 0;
+        size_t toSend = buffer.size();
+
+        while (totalSent < toSend) {
+            ssize_t sent = send(port, buffer.data() + totalSent, toSend - totalSent, 0);
+        if (sent <= 0) {
+            // error or connection closed
+            std::cerr << "Send failed!\n";
+            return;
+            }
+            totalSent += sent;
+        }
+    }
+
+    std::string receiveData(int& port){
+        char headerBuf[4];
+        int received = 0;
+        // First, receive exactly 4 bytes of header
+        while (received < 4) {
+            int n = recv(port, headerBuf + received, 4 - received, 0);
+            if (n <= 0) return ""; // connection closed or error
+            received += n;
+        }
+
+        // Convert header to integer
+        int headerValue = (headerBuf[0] - '0') * 1000 +
+                      (headerBuf[1] - '0') * 100  +
+                      (headerBuf[2] - '0') * 10   +
+                      (headerBuf[3] - '0');
+
+        // Now receive exactly 'headerValue' bytes of payload
+        std::string payload;
+        payload.resize(headerValue);
+        received = 0;
+
+        while (received < headerValue) {
+            int n = recv(port, &payload[received], headerValue - received, 0);
+            if (n <= 0) return ""; // connection closed or error
+            received += n;
+        }
+            //decrypted_data = m.decrypt(payload)
+            //return decrypted_data
+
+            return payload;
+        }
+
     //      implement diffie hellman
     //      implement RSA encryption
 
