@@ -4,11 +4,6 @@
 #include <unistd.h>
 #include <atomic>
 
-#include "server.hpp"
-#include <iostream>
-#include <csignal>
-#include <atomic>
-
 std::atomic<bool> exitFlag(false);
 
 void handleSigint(int) {
