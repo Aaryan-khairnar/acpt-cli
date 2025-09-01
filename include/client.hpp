@@ -17,56 +17,46 @@ class TcpClient{
     
 public:
 
-    TcpClient(const std::string& host, const std::string& port){
-
-        hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
-        hints.ai_socktype = SOCK_STREAM; // TCP
-
-        int address_info_status = getaddrinfo(host.c_str(), port.c_str(), &hints, &res);
-        if (address_info_status != 0) {
-            throw std::runtime_error("getaddrinfo failed");
-            return;
-        }
-
-        connection_port = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if(connection_port == -1){
-            freeaddrinfo(res); //we free res because it has failed
-            res = nullptr;
-            throw std::runtime_error("socket failed");
-            return;
-        }
-
-        int connection_status = connect(connection_port, res->ai_addr, res->ai_addrlen);
-        if (connection_status == -1) {
-            freeaddrinfo(res);
-            close(connection_port);
-            connection_port = -1;
-            throw std::runtime_error("connection failed");
-        }
-
-        std::cout << "Connected successfully!\n";
-
-        // Diffie hellman key exchange
-        // exchange_key(){}
-        }
-
-        void sendData(const std::string& text){
-            Message m;
-            m.sendData(text, connection_port);
-        }
-
-        std::string receiveData(){
-            Message m;
-            return m.receiveData(connection_port);
-        }
-     
-    ~TcpClient() {
-        freeaddrinfo(res);
-        if (connection_port != -1) {
-            close(connection_port);
-        }
-        std::cout << "Connection closed.\n";
+TcpClient(const std::string& host, const std::string& port){
+    hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP
+    int address_info_status = getaddrinfo(host.c_str(), port.c_str(), &hints, &res);
+    if (address_info_status != 0) {
+        throw std::runtime_error("getaddrinfo failed");
+        return;
     }
+    connection_port = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if(connection_port == -1){
+        freeaddrinfo(res); //we free res because it has failed
+        res = nullptr;
+        throw std::runtime_error("socket failed");
+        return;
+    }
+    int connection_status = connect(connection_port, res->ai_addr, res->ai_addrlen);
+    if (connection_status == -1) {
+        freeaddrinfo(res);
+        close(connection_port);
+        connection_port = -1;
+        throw std::runtime_error("connection failed");
+    }
+    std::cout << "Connected successfully!\n";
+    }
+    void sendData(const std::string& text){
+        Message m;
+        m.sendData(text, connection_port);
+    }
+    std::string receiveData(){
+        Message m;
+        return m.receiveData(connection_port);
+    }
+ 
+~TcpClient() {
+    freeaddrinfo(res);
+    if (connection_port != -1) {
+        close(connection_port);
+    }
+    std::cout << "Connection closed.\n";
+}
 
 };
 
