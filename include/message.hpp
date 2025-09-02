@@ -44,6 +44,7 @@ void encode(std::string message){
         data.emplace_back(message[i]);
     }
 }
+
 const std::vector<char>& getData() const {
     return data;
 }
@@ -65,15 +66,15 @@ void sendData(const std::string& text, int& port) {
 }
 
 std::string receiveData(int& port){
-    char headerBuf[4];
+    char headerBuf[8];
     int received = 0;
     // First, receive exactly 4 bytes of header
-    while (received < 4) {
-        int n = recv(port, headerBuf + received, 4 - received, 0);
+    while (received < 8) {
+        int n = recv(port, headerBuf + received, 8 - received, 0);
         if (n <= 0) return ""; // connection closed or error
         received += n;
     }
-    // Convert header to integer
+    // Convert header to integer // CHANGE TO 8
     int headerValue = (headerBuf[0] - '0') * 1000 +
                   (headerBuf[1] - '0') * 100  +
                   (headerBuf[2] - '0') * 10   +
@@ -91,6 +92,7 @@ std::string receiveData(int& port){
         //return decrypted_data
         return payload;
 }
+
 };
 
 #endif

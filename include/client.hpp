@@ -14,7 +14,8 @@ class TcpClient{
     int connection_port = -1;
     struct addrinfo hints{}; //using {} here makes all values of hints default = 0 
     struct addrinfo *res=nullptr;
-    
+    Message m;
+
 public:
 
 TcpClient(const std::string& host, const std::string& port){
@@ -41,12 +42,12 @@ TcpClient(const std::string& host, const std::string& port){
     }
     std::cout << "Connected successfully!\n";
     }
+
     void sendData(const std::string& text){
-        Message m;
         m.sendData(text, connection_port);
     }
+    
     std::string receiveData(){
-        Message m;
         return m.receiveData(connection_port);
     }
  

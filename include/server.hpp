@@ -16,6 +16,7 @@ class TcpServer{
     int client_port = -1; //vector for multiple clients
     struct addrinfo hints{}; //using {} here makes all values of hints default = 0 
     struct addrinfo *res=nullptr;
+    Message m;
 
 public:
 
@@ -78,6 +79,7 @@ TcpServer(const std::string& port){
     }
     std::cout << "Server is listening on port " << port << "...\n";
 }
+
 void acceptClient() {
     struct sockaddr_storage client_addr;
     socklen_t addr_size = sizeof(client_addr);
@@ -87,12 +89,12 @@ void acceptClient() {
     }
     std::cout << "Client connected!\n";
 }
+
 void sendData(const std::string& text){
-    Message m;
     m.sendData(text, client_port);
 }
+
 std::string receiveData(){
-    Message m;
     return m.receiveData(client_port);
 }
 
