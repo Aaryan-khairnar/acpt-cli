@@ -1,12 +1,11 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
 #include <string>
 #include <iostream>
 #include <vector>
+#include <string>
+#include <stdexcept>
 
 /* 
 header is of 4 bytes and maxBytes can be stored as 512 bytes
@@ -27,34 +26,73 @@ data array:
 */
 
 class Message{
-
-    std::vector <char> data;
+std::vector <char> data;
 
 public:
+void encodeHeader(size_t length){
+    data.clear();
+    data.resize(4); 
+    data[0] = '0' + (length / 1000) % 10;  // Thousands place
+    data[1] = '0' + (length / 100) % 10;   // Hundreds place  
+    data[2] = '0' + (length / 10) % 10;    // Tens place
+    data[3] = '0' + (length / 1) % 10;     // Ones place
+}
 
-    void encodeHeader(size_t length){
-        data.clear();
-        data.resize(4); 
-        data[0] = '0' + (length / 1000) % 10;  // Thousands place
-        data[1] = '0' + (length / 100) % 10;   // Hundreds place  
-        data[2] = '0' + (length / 10) % 10;    // Tens place
-        data[3] = '0' + (length / 1) % 10;     // Ones place
+void encode(std::string message){
+    encodeHeader(message.size());
+    for(int i=0; i< message.size(); i++){
+        data.emplace_back(message[i]);
     }
-    
-    void encode(std::string message){
-        encodeHeader(message.size());
-        for(int i=0; i< message.size(); i++){
-            data.emplace_back(message[i]);
-        }
-    }
+}
 
-    const std::vector<char>& getData() const {
+const std::vector<char>& getData() const {
     return data;
-    }
+}
 
-    //      implement diffie hellman
-    //      implement RSA encryption
+void sendData(const std::string& text, int& port) {
+    encode(text);
+    const auto& buffer = getData();
+    size_t totalSent = 0;
+    size_t toSend = buffer.size();
+    while (totalSent < toSend) {
+        ssize_t sent = send(port, buffer.data() + totalSent, toSend - totalSent, 0);
+    if (sent <= 0) {
+        // error or connection closed
+        std::cerr << "Send failed!\n";
+        return;
+        }
+        totalSent += sent;
+    }
+}
+
+std::string receiveData(int& port){
+    char headerBuf[8];
+    int received = 0;
+    // First, receive exactly 4 bytes of header
+    while (received < 8) {
+        int n = recv(port, headerBuf + received, 8 - received, 0);
+        if (n <= 0) return ""; // connection closed or error
+        received += n;
+    }
+    // Convert header to integer // CHANGE TO 8
+    int headerValue = (headerBuf[0] - '0') * 1000 +
+                  (headerBuf[1] - '0') * 100  +
+                  (headerBuf[2] - '0') * 10   +
+                  (headerBuf[3] - '0');
+    // Now receive exactly 'headerValue' bytes of payload
+    std::string payload;
+    payload.resize(headerValue);
+    received = 0;
+    while (received < headerValue) {
+        int n = recv(port, &payload[received], headerValue - received, 0);
+        if (n <= 0) return ""; // connection closed or error
+        received += n;
+    }
+        //decrypted_data = m.decrypt(payload)
+        //return decrypted_data
+        return payload;
+}
 
 };
 
-#endif MESSAGE_HPP
+#endif
