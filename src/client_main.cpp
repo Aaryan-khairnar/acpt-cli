@@ -24,7 +24,7 @@ int main() {
     std::cout << "Enter server IP address: ";
     std::string serverIp;
     std::cin >> serverIp;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     TcpClient client(serverIp, "53490");
     std::cout << "Connected to server. Ready to chat!\n";
